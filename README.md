@@ -9,5 +9,5 @@ Syntax
 str var_one = "Hello"
 println(var_one " World!")
 ```
-Prints out "Hello World". To print out both text and variables, you just need to have a space between the variable and the quotes, and it'll handle itself.  
+Prints out `Hello World!`. To print out both text and variables, you just need to have a space between the variable and the quotes, and it'll handle itself.  
 Currently has `int` `str` `bool` `char` data types
