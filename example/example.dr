@@ -1,3 +1,3 @@
 int var_one = 5
 str var_two = "hello"
-println(var_one " " var_two)
+println(var_one "\n" var_two)

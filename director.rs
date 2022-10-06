@@ -88,8 +88,20 @@ fn main(){
                         if tempstr.chars().nth(c).unwrap().to_string() == "\""{
                             c += 1;
                             while c < tempstr.len() && tempstr.chars().nth(c).unwrap().to_string() != "\""{
-                                in_parentheses = format!("{}{}", in_parentheses, tempstr.chars().nth(c).unwrap().to_string());
-                                c += 1;
+                                if tempstr.chars().nth(c).unwrap().to_string() == "\\"{
+                                    c += 1;
+                                    match tempstr.chars().nth(c).unwrap().to_string().as_str(){
+                                        "n"=>in_parentheses = format!("{}{}", in_parentheses, "\n"),
+                                        "t"=>in_parentheses = format!("{}{}", in_parentheses, "\t"),
+                                        "r"=>in_parentheses = format!("{}{}", in_parentheses, "\r"),
+                                        _=>in_parentheses = format!("{}{}", in_parentheses, tempstr.chars().nth(c).unwrap().to_string()),
+                                    }
+                                    c += 1;
+                                }
+                                else{
+                                    in_parentheses = format!("{}{}", in_parentheses, tempstr.chars().nth(c).unwrap().to_string());
+                                    c += 1;
+                                }
                             }
                         }
                         while c < tempstr.len() && tempstr.chars().nth(c).unwrap().to_string() != "\"" && tempstr.chars().nth(c).unwrap().to_string() != ")" && tempstr.chars().nth(c).unwrap().to_string() != " "{
