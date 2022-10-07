@@ -14,8 +14,8 @@ fn main(){
 
     // Store currently accepted variable types and functions
     let var_types: [&str; 4] = ["int", "str", "bool", "char"];
-    let func_types: [&str; 2] = ["println", "print"];
-    let math_ops: [&str; 4] = ["+", "-", "*", "/"];
+    let func_types: [&str; 3] = ["println", "print", "release"];
+    let math_ops: [&str; 5] = ["+", "-", "*", "/", "%"];
 
     // read in args
     let args: Vec<String> = env::args().collect();
@@ -125,11 +125,32 @@ fn main(){
                         parentheses_var_name = "".to_owned();
                     c += 1;
                 }
+                let mut raw_in_parentheses = "".to_owned();
+                let mut r = tempstr2.len();
+                while r < tempstr.len() && tempstr.chars().nth(r).unwrap().to_string() != "(" && tempstr.chars().nth(r).unwrap().to_string() != ")"{
+                    raw_in_parentheses = format!("{}{}", raw_in_parentheses, tempstr.chars().nth(r).unwrap().to_string());
+                    r += 1
+                }
                 if tempstr2.to_string() == "println"{
                     println!("{}", in_parentheses);
                 }
                 if tempstr2.to_string() == "print"{
                     print!("{}", in_parentheses);
+                }
+                if tempstr2.to_string() == "release"{
+                    if &*indiv_var_types.get(&tempstr2.clone()).expect("Idk").to_string().as_str() == "int"{
+                        int_vars.remove(&tempstr2.clone());
+                    }
+                    if &*indiv_var_types.get(&tempstr2.clone()).expect("Idk").to_string().as_str() == "str"{
+                        str_vars.remove(&tempstr2.clone());
+                    }
+                    if &*indiv_var_types.get(&tempstr2.clone()).expect("Idk").to_string().as_str() == "bool"{
+                        bool_vars.remove(&tempstr2.clone());
+                    }
+                    if &*indiv_var_types.get(&tempstr2.clone()).expect("Idk").to_string().as_str() == "char"{
+                        char_vars.remove(&tempstr2.clone());
+                    }
+                    indiv_var_types.remove(&tempstr2);
                 }
                 in_parentheses = "".to_owned();
             }
@@ -139,63 +160,33 @@ fn main(){
                         if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "=" && tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " "{
                         }
                         if tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " " && math_ops.contains(&tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string().as_str()) && tempstr.chars().nth(tempstr2.len() + 2).unwrap().to_string() == "="{
-                            let c = tempstr2.len() + 2;
-                            let mut temp_int_str: String = "".to_owned();
+                            let mut c = tempstr2.len() + 4;
+                            let mut temp_int_str = "".to_owned();
                             let mut temp_int_int = 0;
-                            let mut temp_int_int_2 = 0;
-                            let mut tempchanged: bool = false;
-                            let mut isint: bool = true;
-                            while c >= tempstr.len(){
-                                while tempstr.chars().nth(c).unwrap().to_string() != " " && ! math_ops.contains(&tempstr.chars().nth(c).unwrap().to_string().as_str()){
-                                    temp_int_str = format!("{}{}", temp_int_str, tempstr.chars().nth(c).unwrap().to_string());
-                                    c += 1;
-                                }
-                                if int_vars.contains_key(&temp_int_str){
-                                    temp_int_int = *int_vars.get(&temp_int_str).clone()?;
-                                    temp_int_str = "".to_owned();
-                                }
-                                else{
-                                    for i in 0..temp_int_str.len(){
-                                        if temp_int_str.chars().nth(i).unwrap() >= 58 as char|| temp_int_str.chars().nth(i).unwrap() <= 47 as char{
-                                            isint = false;
-                                        }
-                                    }
-                                    if isint{
-                                        for i in 0..temp_int_str.len(){
-                                            temp_int_int = temp_int_str.chars().nth(i).unwrap().to_string().parse::<i64>().unwrap();
-                                        }
-                                    }
-                                    isint = true;
-                                }
-                                if math_ops.contains(&tempstr.chars().nth(c).unwrap().to_string().as_str()){
-                                    if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "+"{
-                                        temp_int_int_2 += temp_int_int;
-                                    }
-                                    if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "-"{
-                                        temp_int_int_2 -= temp_int_int;
-                                    }
-                                    if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "*"{
-                                        temp_int_int_2 *= temp_int_int;
-                                    }
-                                    if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "/"{
-                                        temp_int_int_2 /= temp_int_int
-                                    }
-                                    tempchanged = false;
-                                    temp_int_int = 0;
-                                }
+                            while c < tempstr.len(){
+                                temp_int_str = format!("{}{}", temp_int_str, tempstr.chars().nth(c).unwrap().to_string());
                                 c += 1;
                             }
+                            if int_vars.contains_key(&temp_int_str){
+                                temp_int_int = *int_vars.get(&temp_int_str).expect("Idk");
+                            }
+                            else{
+                                temp_int_int = temp_int_str.parse::<i64>().unwrap();
+                            }
                             if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "+"{
-                                println!("add found");
+                                int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") + temp_int_int));
                             }
                             if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "-"{
-                                println!("subtract found");
+                                int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") - temp_int_int));
                             }
                             if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "*"{
-                                println!("multiply found");
+                                int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") * temp_int_int));
                             }
                             if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "/"{
-                                println!("divide found");
+                                int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") / temp_int_int));
+                            }
+                            if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "%"{
+                                int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") % temp_int_int));
                             }
                         }
                     }
