@@ -157,8 +157,6 @@ fn main(){
             else if indiv_var_types.contains_key(&tempstr2){
                 if tempstr2.len() + 2 < tempstr.len(){
                     if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "int".to_string(){
-                        if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "=" && tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " "{
-                        }
                         if tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " " && math_ops.contains(&tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string().as_str()) && tempstr.chars().nth(tempstr2.len() + 2).unwrap().to_string() == "="{
                             let mut c = tempstr2.len() + 4;
                             let mut temp_int_str = "".to_owned();
@@ -188,6 +186,58 @@ fn main(){
                             if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "%"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") % temp_int_int));
                             }
+                        }
+                    }
+                    else if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "str".to_string(){
+                        let mut in_parentheses = "".to_owned();
+                        let mut parentheses_var_name = "".to_owned();
+                        let mut c = tempstr2.len() + 2;
+                        while c < tempstr.len(){
+                            if tempstr.chars().nth(c).unwrap().to_string() == "\""{
+                                c += 1;
+                                while c < tempstr.len() && tempstr.chars().nth(c).unwrap().to_string() != "\""{
+                                    if tempstr.chars().nth(c).unwrap().to_string() == "\\"{
+                                        c += 1;
+                                        match tempstr.chars().nth(c).unwrap().to_string().as_str(){
+                                            "n"=>in_parentheses = format!("{}{}", in_parentheses, "\n"),
+                                            "t"=>in_parentheses = format!("{}{}", in_parentheses, "\t"),
+                                            "r"=>in_parentheses = format!("{}{}", in_parentheses, "\r"),
+                                            _=>in_parentheses = format!("{}{}", in_parentheses, tempstr.chars().nth(c).unwrap().to_string()),
+                                        }
+                                        c += 1;
+                                    }
+                                    else{
+                                        in_parentheses = format!("{}{}", in_parentheses, tempstr.chars().nth(c).unwrap().to_string());
+                                        c += 1;
+                                    }
+                                }
+                            }
+                            while c < tempstr.len() && tempstr.chars().nth(c).unwrap().to_string() != "\"" && tempstr.chars().nth(c).unwrap().to_string() != ")" && tempstr.chars().nth(c).unwrap().to_string() != " "{
+                                parentheses_var_name = format!("{}{}", parentheses_var_name, tempstr.chars().nth(c).unwrap().to_string());
+                                c += 1;
+                            }
+                            if indiv_var_types.contains_key(&parentheses_var_name){
+                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "int".to_string(){
+                                        in_parentheses = format!("{}{}", in_parentheses, int_vars.get(&parentheses_var_name).expect("Idk").to_string());
+                                    }
+                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "str".to_string(){
+                                        in_parentheses = format!("{}{}", in_parentheses, str_vars.get(&parentheses_var_name).expect("Idk"));
+                                    }
+                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "char".to_string(){
+                                        in_parentheses = format!("{}{}", in_parentheses, char_vars.get(&parentheses_var_name).expect("Idk"));
+                                    }
+                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "bool".to_string(){
+                                        in_parentheses = format!("{}{}", in_parentheses, bool_vars.get(&parentheses_var_name).expect("Idk").to_string());
+                                    }
+                                }
+                                parentheses_var_name = "".to_owned();
+                            c += 1;
+                        }
+                        if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "=" && tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " "{
+                            str_vars.insert(tempstr2.clone(), in_parentheses.clone());
+                        }
+                        if tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " " && tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "+" && tempstr.chars().nth(tempstr2.len() + 2).unwrap().to_string() == "="{
+                            str_vars.insert(tempstr2.clone(), format!("{}{}", *str_vars.get(&tempstr2).expect("Idk"), in_parentheses));
                         }
                     }
                 }

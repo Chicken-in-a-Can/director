@@ -1,4 +1,5 @@
 int var_one = 5
 var_one += 6
 str var_two = "hello"
+var_two += " world"
 println(var_one "\n" var_two)
