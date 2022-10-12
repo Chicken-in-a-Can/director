@@ -16,6 +16,7 @@ fn main(){
     let var_types: [&str; 4] = ["int", "str", "bool", "char"];
     let func_types: [&str; 3] = ["println", "print", "release"];
     let math_ops: [&str; 5] = ["+", "-", "*", "/", "%"];
+    let statement_types: [&str; 3] = ["if", "for", "while"];
 
     // read in args
     let args: Vec<String> = env::args().collect();
@@ -30,8 +31,23 @@ fn main(){
         // run file line by line
         for i in 0..splitfile.len(){
             // run through each char in the file, assign to str
+            let mut tempstr: String = "".to_owned();
+            let mut tempstr2: String = "".to_owned();
+            let mut comment_found = false;
             for j in 0..splitfile[i].len(){
-                tempstr = format!("{}{}", tempstr, splitfile[i].chars().nth(j).unwrap().to_string());
+                if j < splitfile[i].len() - 1{
+                    if splitfile[i].chars().nth(j).unwrap() == '/'{
+                        if splitfile[i].chars().nth(j + 1).unwrap() == '/'{
+                            comment_found = true;
+                        }
+                    }
+                }
+                if !comment_found{
+                    tempstr = format!("{}{}", tempstr, splitfile[i].chars().nth(j).unwrap().to_string());
+                }
+            }
+            if comment_found && tempstr.chars().nth(tempstr.len() - 1).unwrap() == ' '{
+                tempstr = format!("{}", tempstr.split_at(tempstr.len() - 1).0);
             }
             // create count var
             let mut c = 0;
@@ -217,20 +233,20 @@ fn main(){
                                 c += 1;
                             }
                             if indiv_var_types.contains_key(&parentheses_var_name){
-                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "int".to_string(){
-                                        in_parentheses = format!("{}{}", in_parentheses, int_vars.get(&parentheses_var_name).expect("Idk").to_string());
-                                    }
-                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "str".to_string(){
-                                        in_parentheses = format!("{}{}", in_parentheses, str_vars.get(&parentheses_var_name).expect("Idk"));
-                                    }
-                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "char".to_string(){
-                                        in_parentheses = format!("{}{}", in_parentheses, char_vars.get(&parentheses_var_name).expect("Idk"));
-                                    }
-                                    if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "bool".to_string(){
-                                        in_parentheses = format!("{}{}", in_parentheses, bool_vars.get(&parentheses_var_name).expect("Idk").to_string());
-                                    }
+                                if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "int".to_string(){
+                                    in_parentheses = format!("{}{}", in_parentheses, int_vars.get(&parentheses_var_name).expect("Idk").to_string());
                                 }
-                                parentheses_var_name = "".to_owned();
+                                if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "str".to_string(){
+                                    in_parentheses = format!("{}{}", in_parentheses, str_vars.get(&parentheses_var_name).expect("Idk"));
+                                }
+                                if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "char".to_string(){
+                                    in_parentheses = format!("{}{}", in_parentheses, char_vars.get(&parentheses_var_name).expect("Idk"));
+                                }
+                                if indiv_var_types.get(&parentheses_var_name).expect("Idk").to_string() == "bool".to_string(){
+                                    in_parentheses = format!("{}{}", in_parentheses, bool_vars.get(&parentheses_var_name).expect("Idk").to_string());
+                                }
+                            }
+                            parentheses_var_name = "".to_owned();
                             c += 1;
                         }
                         if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "=" && tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " "{
@@ -240,11 +256,18 @@ fn main(){
                             str_vars.insert(tempstr2.clone(), format!("{}{}", *str_vars.get(&tempstr2).expect("Idk"), in_parentheses));
                         }
                     }
+                    else if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "bool".to_string(){
+                        match &tempstr[tempstr2.len()..]{
+                            " = true"=>bool_vars.insert(tempstr2.clone(), true.clone()),
+                            " = false"=>bool_vars.insert(tempstr2.clone(), false.clone()),
+                            _=>exit(1),
+                        };
+                    }
                 }
             }
-            tempstr = "".to_owned();
-            tempstr2 = "".to_owned();
         }
+        tempstr = "".to_owned();
+        tempstr2 = "".to_owned();
     }
     else{
         println!("Please specify a file");

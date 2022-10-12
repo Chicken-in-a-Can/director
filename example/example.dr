@@ -1,5 +1,7 @@
-int var_one = 5
+int var_one = 5 // hehe
 var_one += 6
 str var_two = "hello"
 var_two += " world"
-println(var_one "\n" var_two)
+bool var_three = true
+var_three = false
+println(var_one "\n" var_two "\n" var_three)
