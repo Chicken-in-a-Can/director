@@ -4,4 +4,6 @@ str var_two = "hello"
 var_two += " world"
 bool var_three = true
 var_three = false
-println(var_one "\n" var_two "\n" var_three)
+char var_four = 'h'
+var_four = 'y'
+println(var_one "\n" var_two "\n" var_three "\n" var_four)

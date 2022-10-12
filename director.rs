@@ -263,6 +263,9 @@ fn main(){
                             _=>exit(1),
                         };
                     }
+                    else if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "char".to_string(){
+                        char_vars.insert(tempstr2.clone(), tempstr[tempstr2.len() + 3..].replace("\'", "").chars().nth(0).unwrap().clone());
+                    }
                 }
             }
         }
