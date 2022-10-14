@@ -22,6 +22,7 @@ fn main(){
     let args: Vec<String> = env::args().collect();
     let mut tempstr: String = "".to_owned();
     let mut tempstr2: String = "".to_owned();
+    let mut tempstr2_start_pos = 0;
     // check to make sure args were given
     if args.len() > 1{
         // read in file
@@ -53,6 +54,10 @@ fn main(){
             let mut c = 0;
             tempstr2 = "".to_owned();
             // read in first given thing
+            while c < tempstr.len() && tempstr.chars().nth(c).unwrap() == ' ' || tempstr.chars().nth(c).unwrap() == '\t'{
+                c += 1;
+            }
+            tempstr2_start_pos = c;
             while c < tempstr.len() && tempstr.chars().nth(c).unwrap().to_string() != " " && tempstr.chars().nth(c).unwrap().to_string() != "("{
                 tempstr2 = format!("{}{}", tempstr2, tempstr.chars().nth(c).unwrap().to_string());
                 c += 1;
@@ -142,7 +147,7 @@ fn main(){
                     c += 1;
                 }
                 let mut raw_in_parentheses = "".to_owned();
-                let mut r = tempstr2.len();
+                let mut r = tempstr2.len() + tempstr2_start_pos;
                 while r < tempstr.len() && tempstr.chars().nth(r).unwrap().to_string() != "(" && tempstr.chars().nth(r).unwrap().to_string() != ")"{
                     raw_in_parentheses = format!("{}{}", raw_in_parentheses, tempstr.chars().nth(r).unwrap().to_string());
                     r += 1
@@ -171,10 +176,10 @@ fn main(){
                 in_parentheses = "".to_owned();
             }
             else if indiv_var_types.contains_key(&tempstr2){
-                if tempstr2.len() + 2 < tempstr.len(){
+                if tempstr2.len() + 2 + tempstr2_start_pos < tempstr.len(){
                     if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "int".to_string(){
-                        if tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " " && math_ops.contains(&tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string().as_str()) && tempstr.chars().nth(tempstr2.len() + 2).unwrap().to_string() == "="{
-                            let mut c = tempstr2.len() + 4;
+                        if tempstr.chars().nth(tempstr2.len() + tempstr2_start_pos).unwrap().to_string() == " " && math_ops.contains(&tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string().as_str()) && tempstr.chars().nth(tempstr2.len() + 2 + tempstr2_start_pos).unwrap().to_string() == "="{
+                            let mut c = tempstr2.len() + 4 + tempstr2_start_pos;
                             let mut temp_int_str = "".to_owned();
                             let mut temp_int_int = 0;
                             while c < tempstr.len(){
@@ -187,19 +192,19 @@ fn main(){
                             else{
                                 temp_int_int = temp_int_str.parse::<i64>().unwrap();
                             }
-                            if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "+"{
+                            if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "+"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") + temp_int_int));
                             }
-                            if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "-"{
+                            if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "-"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") - temp_int_int));
                             }
-                            if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "*"{
+                            if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "*"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") * temp_int_int));
                             }
-                            if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "/"{
+                            if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "/"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") / temp_int_int));
                             }
-                            if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "%"{
+                            if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "%"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") % temp_int_int));
                             }
                         }
@@ -207,7 +212,7 @@ fn main(){
                     else if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "str".to_string(){
                         let mut in_parentheses = "".to_owned();
                         let mut parentheses_var_name = "".to_owned();
-                        let mut c = tempstr2.len() + 2;
+                        let mut c = tempstr2.len() + 2 + tempstr2_start_pos;
                         while c < tempstr.len(){
                             if tempstr.chars().nth(c).unwrap().to_string() == "\""{
                                 c += 1;
@@ -249,28 +254,26 @@ fn main(){
                             parentheses_var_name = "".to_owned();
                             c += 1;
                         }
-                        if tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "=" && tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " "{
+                        if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "=" && tempstr.chars().nth(tempstr2.len() + tempstr2_start_pos).unwrap().to_string() == " "{
                             str_vars.insert(tempstr2.clone(), in_parentheses.clone());
                         }
-                        if tempstr.chars().nth(tempstr2.len()).unwrap().to_string() == " " && tempstr.chars().nth(tempstr2.len() + 1).unwrap().to_string() == "+" && tempstr.chars().nth(tempstr2.len() + 2).unwrap().to_string() == "="{
+                        if tempstr.chars().nth(tempstr2.len() + tempstr2_start_pos).unwrap().to_string() == " " && tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "+" && tempstr.chars().nth(tempstr2.len() + 2 + tempstr2_start_pos).unwrap().to_string() == "="{
                             str_vars.insert(tempstr2.clone(), format!("{}{}", *str_vars.get(&tempstr2).expect("Idk"), in_parentheses));
                         }
                     }
                     else if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "bool".to_string(){
-                        match &tempstr[tempstr2.len()..]{
+                        match &tempstr[tempstr2.len() + tempstr2_start_pos..]{
                             " = true"=>bool_vars.insert(tempstr2.clone(), true.clone()),
                             " = false"=>bool_vars.insert(tempstr2.clone(), false.clone()),
                             _=>exit(1),
                         };
                     }
                     else if indiv_var_types.get(&tempstr2).expect("Idk").to_string() == "char".to_string(){
-                        char_vars.insert(tempstr2.clone(), tempstr[tempstr2.len() + 3..].replace("\'", "").chars().nth(0).unwrap().clone());
+                        char_vars.insert(tempstr2.clone(), tempstr[tempstr2.len() + 3 + tempstr2_start_pos..].replace("\'", "").chars().nth(0).unwrap().clone());
                     }
                 }
             }
         }
-        tempstr = "".to_owned();
-        tempstr2 = "".to_owned();
     }
     else{
         println!("Please specify a file");

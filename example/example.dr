@@ -1,5 +1,5 @@
-int var_one = 5 // hehe
-var_one += 6
+    int var_one = 5 // hehe
+    var_one += 6
 str var_two = "hello"
 var_two += " world"
 bool var_three = true
