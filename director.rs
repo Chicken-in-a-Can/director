@@ -7,11 +7,12 @@ fn main(){
 
     // Variables stored in HashMaps, cause easy
     let mut indiv_var_types: HashMap<String, String> = HashMap::new();
-    let mut int_vars: HashMap<String, i64> = HashMap::new();
+    let mut int_vars: HashMap<String, i128> = HashMap::new();
     let mut str_vars: HashMap<String, String> = HashMap::new();
     let mut bool_vars: HashMap<String, bool> = HashMap::new();
     let mut char_vars: HashMap<String, char> = HashMap::new();
 
+    let mut indent_count: HashMap<u64, u64> = HashMap::new();
     // Store currently accepted variable types and functions
     let var_types: [&str; 4] = ["int", "str", "bool", "char"];
     let func_types: [&str; 3] = ["println", "print", "release"];
@@ -58,6 +59,7 @@ fn main(){
                 c += 1;
             }
             tempstr2_start_pos = c;
+            indent_count.insert(i.clone() as u64, c.clone() as u64);
             while c < tempstr.len() && tempstr.chars().nth(c).unwrap().to_string() != " " && tempstr.chars().nth(c).unwrap().to_string() != "("{
                 tempstr2 = format!("{}{}", tempstr2, tempstr.chars().nth(c).unwrap().to_string());
                 c += 1;
@@ -82,7 +84,7 @@ fn main(){
                 // now add to HashMaps
                 indiv_var_types.insert(var_name.clone(), tempstr2.clone());
                 if tempstr2.as_str() == "int"{
-                    int_vars.insert(var_name.clone(), var_content.parse::<i64>().unwrap().clone());
+                    int_vars.insert(var_name.clone(), var_content.parse::<i128>().unwrap().clone());
                 }
                 else if tempstr2.as_str() == "str"{
                     str_vars.insert(var_name.clone(), var_content.replace("\"", "").clone());
@@ -190,7 +192,7 @@ fn main(){
                                 temp_int_int = *int_vars.get(&temp_int_str).expect("Idk");
                             }
                             else{
-                                temp_int_int = temp_int_str.parse::<i64>().unwrap();
+                                temp_int_int = temp_int_str.parse::<i128>().unwrap();
                             }
                             if tempstr.chars().nth(tempstr2.len() + 1 + tempstr2_start_pos).unwrap().to_string() == "+"{
                                 int_vars.insert(tempstr2.clone(), (*int_vars.get(&tempstr2).expect("Idk") + temp_int_int));
